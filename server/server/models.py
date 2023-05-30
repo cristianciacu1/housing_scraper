@@ -6,31 +6,37 @@ from mongoengine.fields import ListField, StringField, DateTimeField, IntField
 class Property(Document):
     name = StringField()
     url = StringField()
-    price = StringField()
+    price = IntField()
+    no_of_rooms = IntField()
+    apart_type = StringField()
+    agency = StringField()
+    publisher_website = StringField()
     img_src = StringField()
-    surface_area = StringField()
-    number_of_rooms = StringField()
-    furniture_status = StringField()
-    publish_website_url = StringField()
-    publish_website_name = StringField()
     last_modified = DateTimeField()
+    area = IntField()
 
     def save(self):
         doc = {
             '_id': self.name,
-            'url': [self.url],    
-            'price': [self.price],
+            'url': [self.url],
             'img_src': [self.img_src],
-            'surface_area': [self.surface_area],
-            'number_of_rooms': [self.number_of_rooms],
-            'furniture_status': [self.furniture_status],
-            'publish_website_url': [self.publish_website_url],
-            'publish_website_name': [self.publish_website_name],
-            'last_modified': [self.last_modified]
+            'price_min': self.price,
+            'price_max': self.price,
+            'area_min': self.area,
+            'area_max': self.area,
+            'no_of_rooms_min': self.no_of_rooms,
+            'no_of_rooms_max': self.no_of_rooms,
+            'apart_type': [self.apart_type],
+            'agencies': [self.agency],
+            'publisher_websites': [self.publisher_website],
+            'last_modified': self.last_modified
         }
         db.properties.insert_one(doc)
 
     def update(self):
         filter = {'_id': self.name, 'url': {'$ne': self.url}}
-        update = {'$push': {'url': self.url, 'price': self.price, 'img_src': self.img_src, 'surface_area': self.surface_area, 'number_of_rooms': self.number_of_rooms, 'furniture_status': self.furniture_status, 'publish_website_url': self.publish_website_url, 'publish_website_name': self.publish_website_name, 'last_modified': self.last_modified}}
+        update = {'$push': {'url': self.url, 'img_src': self.img_src, 'apart_type': self.apart_type, 'agencies': self.agency, 'publisher_websites': self.publisher_website }, 
+                  '$min': {'price_min': self.price, 'no_of_rooms_min': self.no_of_rooms, 'area_min': self.area},
+                  '$max': {'price_max': self.price, 'no_of_rooms_max ': self.no_of_rooms, 'area_max': self.area},
+                  '$set': {'last_modified': self.last_modified} }
         db.properties.update_one(filter=filter, update=update)

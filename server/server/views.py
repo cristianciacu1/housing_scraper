@@ -7,6 +7,8 @@ from datetime import datetime
 import pymongo.errors
 from utils import db
 import pytz
+from pymongo.errors import PyMongoError
+from server.views_helper import serializeRooms, serializePrice
 
 
 def index(request):
@@ -41,52 +43,51 @@ def responseEntityBad():
 
 def scrape_websites(request):
     try:
-        scrape_plaza(request)
-        # scrape_huurwoningen(request)
+        # scrape_plaza(request)
+        scrape_huurwoningen(request)
         return HttpResponse(status=200)
-    except:
-        return HttpResponse(status=400)
+    except PyMongoError as e:
+        print("An error occurred while working with MongoDB Atlas:", e)
 
 
-def scrape_plaza(request):
-    BASE_URL = 'https://plaza.newnewnew.space/'
-    # url = "https://plaza.newnewnew.space/te-huur#?passendheid=compleet&land=524&gesorteerd-op=prijs%2B&locatie=Delft-Nederland%2B-%2BZuid-Holland"
-    url = "https://plaza.newnewnew.space/te-huur#?passendheid=compleet&land=524&gesorteerd-op=prijs%2B&locatie=Rotterdam-Nederland%2B-%2BZuid-Holland"
+# def scrape_plaza(request):
+#     BASE_URL = 'https://plaza.newnewnew.space/'
+#     # url = "https://plaza.newnewnew.space/te-huur#?passendheid=compleet&land=524&gesorteerd-op=prijs%2B&locatie=Delft-Nederland%2B-%2BZuid-Holland"
+#     url = "https://plaza.newnewnew.space/te-huur#?passendheid=compleet&land=524&gesorteerd-op=prijs%2B&locatie=Rotterdam-Nederland%2B-%2BZuid-Holland"
 
-    response = requests.get(url)
+#     response = requests.get(url)
 
-    # Create a BeautifulSoup object to parse the HTML content
-    soup = BeautifulSoup(response.content, 'html.parser')
+#     # Create a BeautifulSoup object to parse the HTML content
+#     soup = BeautifulSoup(response.content, 'html.parser')
 
-    print(soup)
+#     print(soup)
 
-    # Find the HTML elements containing the real estate listings
-    listings = soup.find_all('section', class_='list-item ng-scope')
+#     # Find the HTML elements containing the real estate listings
+#     listings = soup.find_all('section', class_='list-item ng-scope')
     
-    # print(listings)
+#     # print(listings)
 
-    for listing in listings:
-        # Extract Property Name
-        listing_name = listing.find('span', class_='ng-binding notranslate').text.strip()
-        listing_url = listing.find('a')['href']
-        price = listing.find('span', class_='kosten-regel2 ng-binding').text.strip()
-        img_src = listing.find('img')['src']
-        number_of_rooms = listing.find('span', class_='woningtype ng-binding ng-scope').text.strip()
-        surface_area = listing.find('span', class_='object-label-value ng-binding').text.strip()
-        furniture_status = "Furnished"
+#     for listing in listings:
+#         # Extract Property Name
+#         listing_name = listing.find('span', class_='ng-binding notranslate').text.strip()
+#         listing_url = listing.find('a')['href']
+#         price = listing.find('span', class_='kosten-regel2 ng-binding').text.strip()
+#         img_src = listing.find('img')['src']
+#         number_of_rooms = listing.find('span', class_='woningtype ng-binding ng-scope').text.strip()
+#         surface_area = listing.find('span', class_='object-label-value ng-binding').text.strip()
 
-        modified = get_current_time()
+#         modified = get_current_time()
 
-        property = Property(name=listing_name, url=listing_url, price=price, img_src=img_src, surface_area=surface_area, number_of_rooms=number_of_rooms, furniture_status=furniture_status, publish_website_url=BASE_URL, publish_website_name="Plaza", last_modified=modified)
+#         property = Property(name=listing_name, url=listing_url, price=price, img_src=img_src, area=surface_area, no_of_rooms=number_of_rooms, apart_type="Apartment", agency="Not available", publisher_website="" ,last_modified=modified)
 
-        try:
-            property.save()
-            print(f"{listing_name} was successfully saved.")
-        except pymongo.errors.DuplicateKeyError:
-            property.update()
-            print(f"{listing_name} was successfully updated.")
+#         try:
+#             property.save()
+#             print(f"{listing_name} was successfully saved.")
+#         except pymongo.errors.DuplicateKeyError:
+#             property.update()
+#             print(f"{listing_name} was successfully updated.")
 
-    return HttpResponse(status=200)
+#     return HttpResponse(status=200)
 
 
 def get_all_listings(request):
@@ -130,36 +131,25 @@ def scrape_huurwoningen(request):
             listing_url = BASE_URL + base.a.get('href')
 
             price = listing.find('div', class_='listing-search-item__price').text.strip()
-            price = price.replace("per maand", "per month")
+            price = serializePrice(price)
 
             img_src = listing.find('img')['src']
 
             number_of_rooms = listing.find('li', class_='illustrated-features__item illustrated-features__item--number-of-rooms')
             if number_of_rooms is None:
-                number_of_rooms = '?'
+                number_of_rooms = 0
             else:
-                number_of_rooms = number_of_rooms.text.strip()
-                number_of_rooms = number_of_rooms.replace("kamer", "room")
+                number_of_rooms = serializeRooms(number_of_rooms.text.strip())
 
             surface_area = listing.find('li', class_='illustrated-features__item illustrated-features__item--surface-area')
             if surface_area is None:
                 surface_area = '?'
             else:
-                surface_area = surface_area.text.strip()
-
-            furniture_status = listing.find('li', class_='illustrated-features__item illustrated-features__item--interior')
-            if furniture_status is None:
-                furniture_status = '?'
-            else:
-                furniture_status = furniture_status.text.strip()
-                if furniture_status == "Gestoffeerd":
-                    furniture_status = "Upholstered"
-                elif furniture_status == "Gemeubileerd":
-                    furniture_status = "Furnished"
+                surface_area = surface_area.text.strip().replace(" m²", "")
 
             modified = get_current_time()
 
-            property = Property(name=listing_name, url=listing_url, price=price, img_src=img_src, surface_area=surface_area, number_of_rooms=number_of_rooms, furniture_status=furniture_status, publish_website_url=BASE_URL, publish_website_name="Huurwoningen", last_modified=modified)
+            property = Property(name=listing_name, url=listing_url, price=price, img_src=img_src, area=surface_area, no_of_rooms=number_of_rooms, apart_type="Apartment", agency="Not available", publisher_website=BASE_URL, last_modified=modified)
 
             try:
                 property.save()

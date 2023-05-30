@@ -1,1 +1,3 @@
 .vscode
+frontend/node_modules/.cache/
+server/server/__pycache__/
