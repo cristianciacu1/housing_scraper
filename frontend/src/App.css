@@ -53,3 +53,7 @@
   width: 100%;
   height: 180px;
 }
+
+.custom_modal_header {
+  border-bottom: 0 !important;
+}
