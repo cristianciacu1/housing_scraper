@@ -1,7 +1,7 @@
 import './App.css';
 import axios from 'axios'
 import { useEffect, useState } from 'react';
-import { Button, CardGroup, Container, Row } from 'react-bootstrap'
+import { CardGroup, Container, Row } from 'react-bootstrap'
 import ListingCard from './components/ListingCard';
 
 function App() {
