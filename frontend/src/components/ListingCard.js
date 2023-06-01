@@ -1,6 +1,8 @@
-import { Button, Card, Col } from 'react-bootstrap'
+import { Card, Col } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useState } from 'react';
 import { faMoneyBill, faChartArea, faPeopleRoof } from '@fortawesome/free-solid-svg-icons';
+import ListingModal from './ListingModal';
 
 export default function ListingCard({ element, index }) {
 
@@ -12,6 +14,11 @@ export default function ListingCard({ element, index }) {
     }
 
     const data = dataSeserializer(element['last_modified'])
+
+    // Required for Modal.
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     return(
         <Col lg={4} md={6} key={index} className="pb-3 ps-2 pe-2 d-flex align-items-stretch">
@@ -73,6 +80,7 @@ export default function ListingCard({ element, index }) {
                     <small className="text-muted">Last updated: {data[0]} at {data[1]}</small>
                 </Card.Footer>
             </Card>
+            <ListingModal show={show} handleClose={handleClose} />
         </Col>  
     )
 }
