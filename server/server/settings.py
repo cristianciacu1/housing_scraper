@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -99,6 +101,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CELERY_BEAT_SCHEDULE = {
+    'scrape_websites_every_120_minutes': {
+        'task': 'server.tasks.scrape_task',
+        'schedule': crontab(minute='*/120'),
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

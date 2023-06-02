@@ -45,6 +45,7 @@ def scrape_websites(request):
     try:
         # scrape_plaza(request)
         scrape_huurwoningen(request)
+        print("it was called.")
         return HttpResponse(status=200)
     except PyMongoError as e:
         print("An error occurred while working with MongoDB Atlas:", e)
@@ -91,7 +92,7 @@ def scrape_websites(request):
 
 
 def get_all_listings(request):
-    response = list(db.properties.find())
+    response = list(db.properties.find().sort("last_modified", -1))
     return responseEntityGood(response)
 
 def get_current_time():
