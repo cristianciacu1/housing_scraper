@@ -3,7 +3,7 @@ import ListingBasicInfo from './ListingBasicInfo'
 
 export default function ListingModal({ show, handleClose, element }) {
     return (
-        <Modal show={show} onHide={handleClose} size="lg">
+        <Modal show={show} onHide={handleClose} size="xl">
             <Modal.Header className="custom_modal_header" closeButton />
             <Modal.Body>
                 <Container>

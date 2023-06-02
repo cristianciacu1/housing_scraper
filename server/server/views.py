@@ -45,6 +45,7 @@ def scrape_websites(request):
     try:
         # scrape_plaza(request)
         scrape_huurwoningen(request)
+        print("it was called.")
         return HttpResponse(status=200)
     except PyMongoError as e:
         print("An error occurred while working with MongoDB Atlas:", e)

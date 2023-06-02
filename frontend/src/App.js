@@ -8,38 +8,19 @@ function App() {
 
   const [properties, setProperties] = useState([])
 
+  const handleGet = async (event) => {
+    await axios.get('http://localhost:8000/getalllistings/')
+      .then(response => {
+        setProperties(response.data)
+        console.log("Retrieval was sucessful.")
+      })
+      .catch(error => {
+        console.log('Retrieval failed.')
+      })
+  }
+
   useEffect(() => {
-    const handleGet = async (event) => {
-      await axios.get('http://localhost:8000/getalllistings/')
-        .then(response => {
-          setProperties(response.data)
-          console.log("Retrieval was sucessful.")
-        })
-        .catch(error => {
-          console.log('Retrieval failed.')
-        })
-    }
-
-    const handleUpdate = async (event) => {
-      await axios.get('http://localhost:8000/updateall/')
-        .then(response => {
-          console.log("Updated.")
-          handleGet()
-        })
-        .catch(error => {
-          console.log('Not updated.')
-        })
-    }
-    
     handleGet();
-
-    // Set up an interval to call fetchData every 10 minutes
-    const interval = setInterval(handleUpdate, 10 * 60 * 1000);
-
-    // Clean up the interval on component unmount
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
   return (
