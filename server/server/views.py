@@ -45,7 +45,6 @@ def scrape_websites(request):
     try:
         # scrape_plaza(request)
         scrape_huurwoningen(request)
-        print("it was called.")
         return HttpResponse(status=200)
     except PyMongoError as e:
         print("An error occurred while working with MongoDB Atlas:", e)
@@ -154,10 +153,8 @@ def scrape_huurwoningen(request):
 
             try:
                 property.save()
-                print(f"{listing_name} was successfully saved.")
             except pymongo.errors.DuplicateKeyError:
                 property.update()
-                print(f"{listing_name} was successfully updated.")
 
     return HttpResponse(status=200);
 

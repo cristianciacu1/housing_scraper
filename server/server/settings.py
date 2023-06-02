@@ -102,9 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CELERY_BEAT_SCHEDULE = {
-    'scrape_websites_every_120_minutes': {
+    'scrape_websites_every_minute': {
         'task': 'server.tasks.scrape_task',
-        'schedule': crontab(minute='*/120'),
+        'schedule': crontab(minute='*/1'),
     },
 }
 

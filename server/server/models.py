@@ -32,6 +32,7 @@ class Property(Document):
             'last_modified': self.last_modified
         }
         db.properties.insert_one(doc)
+        print(f"{self.name} was successfully saved.")
 
     def update(self):
         filter = {'_id': self.name, 'url': {'$ne': self.url}}
@@ -39,4 +40,8 @@ class Property(Document):
                   '$min': {'price_min': self.price, 'no_of_rooms_min': self.no_of_rooms, 'area_min': self.area},
                   '$max': {'price_max': self.price, 'no_of_rooms_max ': self.no_of_rooms, 'area_max': self.area},
                   '$set': {'last_modified': self.last_modified} }
-        db.properties.update_one(filter=filter, update=update)
+        
+        result = db.properties.update_one(filter=filter, update=update)
+
+        if result.matched_count != 0:
+            print(f"{self.name} was successfully updated.")
