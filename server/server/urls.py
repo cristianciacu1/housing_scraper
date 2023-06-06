@@ -23,5 +23,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.index, name="index"),
     path("updateall/", views.scrape_websites, name="updateAll"),
-    path("getalllistings/", views.get_all_listings, name="getListings")
+    path("getalllistings/", views.get_all_listings, name="getListings"),
+    path("scrapepararius/", views.scrape_pararius, name="scrapePararius")
 ]

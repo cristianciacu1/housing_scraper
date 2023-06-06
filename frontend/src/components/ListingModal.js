@@ -2,7 +2,8 @@ import { Accordion, Button, Container, Modal } from 'react-bootstrap'
 import ListingAdvancedInfo from './ListingAdvancedInfo'
 
 export default function ListingModal({ show, handleClose, element }) {
-    const website_names = new Map([["https://www.huurwoningen.nl", "Huurwoningen"]])
+    const website_names = new Map([["https://www.huurwoningen.nl", "Huurwoningen"], 
+                                   ["https://www.pararius.nl", "Pararius"]])
     return (
         <Modal show={show} onHide={handleClose} size="xl">
             <Modal.Header className="custom_modal_header pe-4 pt-4 pb-0" closeButton />
@@ -41,7 +42,7 @@ export default function ListingModal({ show, handleClose, element }) {
                                             </div>
                                             <div id="available_on">
                                                 <p className="fw-bold m-0">Available on</p>
-                                                <p className="m-0 text-break">Huurwoningen</p>
+                                                <p className="m-0 text-break">{website_names.get(element['publisher_websites'][index])}</p>
                                             </div>
                                         </div>
                                     </div>

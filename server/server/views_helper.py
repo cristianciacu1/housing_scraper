@@ -2,7 +2,11 @@ def serializePrice(price):
     price = price.replace(" per maand", "")
     price = price.replace(".", "")
     price = price[2:]
-    price = int(price)
+
+    try:
+        price = int(price)
+    except ValueError:
+        price = "-1" 
 
     return price
 
